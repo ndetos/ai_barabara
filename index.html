@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Barabara — AI-Driven Road Project Management for Africa</title>
-<meta name="description" content="AI Barabara is an AI-driven road project management assistant developed in Kenya for KURA. Computer-vision road inspection, HDM-4-reduced-form feasibility analysis, and decision-support dashboarding.">
+<title>AI Barabara - See a pothole. Get a decision.</title>
+<meta name="description" content="AI Barabara is a working prototype built in Kenya with KURA. Computer vision inspects the road. HDM-4 economics decides if the repair pays for itself. Engineers make the call.">
 
-<!-- Open Graph for social preview -->
-<meta property="og:title" content="AI Barabara — AI-Driven Road Project Management for Africa">
+<meta property="og:title" content="AI Barabara - See a pothole. Get a decision.">
 <meta property="og:description" content="Working prototype developed with the Kenya Urban Roads Authority (KURA). 4-class road damage detection, HDM-4 feasibility analysis, and decision-support dashboard.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="images/arics1.png">
 
 <style>
   :root {
@@ -38,7 +38,6 @@
   a:hover { text-decoration: underline; }
   img { max-width: 100%; display: block; }
 
-  /* --- Navigation --- */
   nav {
     position: sticky; top: 0; z-index: 100;
     background: rgba(10, 15, 30, 0.92);
@@ -56,14 +55,13 @@
   nav ul a:hover { color: var(--text); text-decoration: none; }
   @media (max-width: 720px) { nav ul { display: none; } }
 
-  /* --- Layout --- */
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
   section { padding: 80px 0; }
   section.tight { padding: 60px 0; }
   @media (max-width: 720px) { section { padding: 56px 0; } }
 
-  h1 { font-size: 2.8rem; line-height: 1.15; margin: 0 0 16px;
-       letter-spacing: -0.02em; font-weight: 700; }
+  h1 { font-size: 3rem; line-height: 1.1; margin: 0 0 20px;
+       letter-spacing: -0.025em; font-weight: 700; }
   h2 { font-size: 2rem; margin: 0 0 16px; letter-spacing: -0.015em; font-weight: 700; }
   h3 { font-size: 1.15rem; margin: 0 0 12px; font-weight: 600; }
   @media (max-width: 720px) { h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } }
@@ -75,12 +73,12 @@
   .lead { font-size: 1.15rem; color: var(--muted); max-width: 780px; }
   .muted { color: var(--muted); }
 
-  /* --- Hero --- */
   .hero {
     padding: 96px 0 64px;
     background: radial-gradient(ellipse at top, rgba(56,189,248,0.10), transparent 60%);
   }
   .hero h1 span { color: var(--accent); }
+  .hero .lead strong { color: var(--text); font-weight: 600; }
   .partners {
     display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
     margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--border);
@@ -93,43 +91,125 @@
     width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
   }
 
-  /* --- Buttons --- */
   .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
   .btn {
     display: inline-block; padding: 12px 24px; border-radius: 8px;
     font-weight: 600; font-size: 0.95rem; transition: all 0.15s;
     border: 1px solid transparent; cursor: pointer;
   }
-  .btn-primary {
-    background: var(--accent); color: #0a0f1e;
-  }
+  .btn-primary { background: var(--accent); color: #0a0f1e; }
   .btn-primary:hover { background: #7dd3fc; text-decoration: none; }
-  .btn-secondary {
-    background: transparent; color: var(--text); border-color: var(--border);
-  }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 
-  /* --- Video --- */
-  .video-wrap {
-    position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */
-    border-radius: 12px; overflow: hidden;
-    border: 1px solid var(--border);
-    background: #000;
+  /* --- Three-panel pipeline with scrollable frames --- */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+    align-items: stretch;
   }
-  .video-wrap iframe {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%; border: 0;
-  }
-  .video-placeholder {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    background: linear-gradient(135deg, #111a2e, #0a0f1e);
-    color: var(--muted); font-size: 1rem; gap: 12px; text-align: center; padding: 24px;
-  }
-  .video-placeholder .icon { font-size: 3rem; color: var(--accent); }
-  .video-caption { color: var(--muted); font-size: 0.9rem; margin-top: 12px; text-align: center; }
+  @media (max-width: 900px) { .pipeline { grid-template-columns: 1fr; } }
 
-  /* --- Metrics --- */
+  .pipeline-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Step badge now sits ABOVE the image, in its own bar */
+  .step-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10, 15, 30, 0.6);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .step-bar .step-badge {
+    background: rgba(56,189,248,0.12);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .step-bar .step-title {
+    font-size: 0.82rem; color: var(--muted); font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+
+  /* Scrollable image frame */
+  .img-scroll {
+    position: relative;
+    height: 320px;
+    background: #0a0f1e;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  .img-scroll::-webkit-scrollbar { width: 8px; }
+  .img-scroll::-webkit-scrollbar-track { background: transparent; }
+  .img-scroll::-webkit-scrollbar-thumb {
+    background: var(--border); border-radius: 4px;
+  }
+  .img-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  .img-scroll img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* No object-fit - we want the natural aspect ratio so the user
+       can scroll through the full screenshot */
+  }
+  .img-scroll .placeholder {
+    color: var(--muted); font-size: 0.85rem; text-align: center;
+    padding: 60px 24px; display: block;
+  }
+
+  /* "Scroll to explore" hint chip pinned to the bottom-right of the frame */
+  .scroll-hint {
+    position: sticky;
+    bottom: 8px;
+    float: right;
+    margin-right: 8px;
+    background: rgba(10, 15, 30, 0.9);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    pointer-events: none;
+    letter-spacing: 0.04em;
+  }
+
+  .pipeline-step .caption {
+    padding: 20px 20px 24px;
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+  .pipeline-step .caption h4 {
+    margin: 0 0 8px; font-size: 1rem; font-weight: 600;
+  }
+  .pipeline-step .caption p {
+    margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.55;
+  }
+  .pipeline-step .caption .arrow {
+    margin-top: auto; padding-top: 16px;
+    color: var(--accent); font-size: 0.85rem; font-weight: 600;
+  }
+  @media (max-width: 900px) {
+    .pipeline-step .caption .arrow::after { content: " ↓"; }
+    .pipeline-step .caption .arrow span { display: none; }
+  }
+
   .metrics {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
@@ -143,12 +223,18 @@
   .metric .value { font-size: 2.2rem; font-weight: 700; color: var(--accent);
                    line-height: 1; margin: 12px 0 6px; letter-spacing: -0.02em; }
   .metric .desc { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
-
-  /* --- Feature grid --- */
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
+  .metric .sowhat {
+    color: var(--text); font-size: 0.85rem; line-height: 1.5;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
   }
+
+  .grid-3 {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 40px;
+  }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } }
+
   .card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 12px; padding: 28px;
@@ -159,74 +245,56 @@
   }
   .card p { color: var(--muted); margin: 0; font-size: 0.95rem; line-height: 1.6; }
 
-  /* --- Screenshot gallery --- */
-  .gallery {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-  }
-  .shot {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-  }
-  .shot img {
-    width: 100%; display: block; background: #0a0f1e;
-    aspect-ratio: 16 / 10; object-fit: cover;
-  }
-  .shot .placeholder {
-    aspect-ratio: 16 / 10; display: flex; align-items: center;
-    justify-content: center; color: var(--muted); font-size: 0.9rem;
-    background: #0a0f1e;
-  }
-  .shot .caption {
-    padding: 16px 20px; border-top: 1px solid var(--border);
-  }
-  .shot .caption h4 { margin: 0 0 6px; font-size: 1rem; }
-  .shot .caption p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
-
-  /* --- Timeline --- */
-  .timeline { position: relative; padding-left: 32px; }
-  .timeline::before {
-    content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
-    width: 2px; background: var(--border);
-  }
-  .timeline-item { position: relative; padding: 12px 0 24px; }
-  .timeline-item::before {
-    content: ''; position: absolute; left: -29px; top: 18px;
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--accent); border: 3px solid var(--bg);
-  }
-  .timeline-item h4 { margin: 0 0 4px; font-size: 1rem; }
-  .timeline-item p { margin: 0; color: var(--muted); font-size: 0.92rem; }
-
-  /* --- Ask box --- */
   .ask {
     background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(56,189,248,0.02));
     border: 1px solid rgba(56,189,248,0.3);
     border-radius: 16px; padding: 40px; margin-top: 24px;
   }
-  .ask h3 { color: var(--accent); }
-  .ask ul { padding-left: 20px; color: var(--muted); }
-  .ask li { margin: 10px 0; line-height: 1.6; }
-
-  /* --- Contact --- */
-  .contact {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 32px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  .ask h3 { color: var(--accent); margin-top: 0; }
+  .ask-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 20px;
   }
-  @media (max-width: 720px) { .contact { grid-template-columns: 1fr; } }
-  .contact h4 { margin: 0 0 8px; font-size: 1rem; }
-  .contact p { margin: 4px 0; color: var(--muted); font-size: 0.92rem; }
+  @media (max-width: 720px) { .ask-row { grid-template-columns: 1fr; } }
+  .ask-row h4 {
+    margin: 0 0 12px; font-size: 0.95rem; color: var(--text);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .ask-row ul { padding-left: 20px; color: var(--muted); margin: 0; }
+  .ask-row li { margin: 8px 0; line-height: 1.55; font-size: 0.92rem; }
 
-  /* --- Footer --- */
+  /* --- Contact - single centered card --- */
+  .contact-single {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 32px;
+    margin-top: 32px;
+    max-width: 520px;
+  }
+  .contact-single h4 {
+    margin: 0 0 16px; font-size: 0.8rem;
+    color: var(--accent); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .contact-single .name {
+    font-size: 1.4rem; font-weight: 700; margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .contact-single .org {
+    color: var(--muted); font-size: 0.95rem; margin: 0 0 16px;
+  }
+  .contact-single .email {
+    font-size: 1rem; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: inline-block;
+  }
+
   footer {
     border-top: 1px solid var(--border); padding: 40px 0;
     color: var(--muted); font-size: 0.85rem; text-align: center;
   }
   footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 
-  /* --- Utility --- */
-  .divider { height: 1px; background: var(--border); margin: 64px 0; }
   .badge {
     display: inline-block; padding: 4px 10px; border-radius: 999px;
     font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
@@ -237,41 +305,33 @@
 </head>
 <body>
 
-<!-- ============================================================ -->
-<!-- NAVIGATION                                                    -->
-<!-- ============================================================ -->
 <nav>
   <div class="inner">
     <div class="brand">AI <span>Barabara</span></div>
     <ul>
-      <li><a href="#demo">Demo</a></li>
+      <li><a href="#how">How it works</a></li>
       <li><a href="#evidence">Evidence</a></li>
-      <li><a href="#screenshots">Screenshots</a></li>
-      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="#modules">Modules</a></li>
       <li><a href="#ask">The Ask</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ============================================================ -->
-<!-- HERO                                                          -->
-<!-- ============================================================ -->
 <header class="hero">
   <div class="wrap">
     <div class="kicker">Origin Labs Africa · Kenya Urban Roads Authority</div>
-    <h1>AI Barabara — <span>AI-driven road project management</span> for Africa.</h1>
+    <h1>See a pothole. <span>Get a decision.</span></h1>
     <p class="lead">
-      A working prototype that uses computer vision to inspect roads, AI-assisted
-      economic analysis to prioritise maintenance, and a decision-support dashboard
-      for road engineers and management. Developed in Kenya with KURA.
+      <strong>AI Barabara</strong> is a working prototype built in Kenya with KURA.
+      You upload a road photograph. Computer vision identifies the defect.
+      An HDM-4 economic engine tells you what it costs to fix and whether
+      fixing it is worth the money. A qualified engineer makes the final call.
     </p>
 
     <div class="btn-row">
-      <a class="btn btn-primary" href="#demo">Watch the demo</a>
-      <a class="btn btn-secondary" href="#evidence">See the evidence</a>
-      <!-- Update the HF link once your Space is live: -->
-      <a class="btn btn-secondary" href="#ask">Live demo on request</a>
+      <a class="btn btn-primary" href="#how">See how it works</a>
+      <a class="btn btn-secondary" href="#ask">Request a live demo</a>
     </div>
 
     <div class="partners">
@@ -282,74 +342,112 @@
   </div>
 </header>
 
-<!-- ============================================================ -->
-<!-- VIDEO                                                         -->
-<!-- ============================================================ -->
-<section id="demo" class="tight">
+<section id="how" class="tight">
   <div class="wrap">
-    <div class="kicker">Live demo</div>
-    <h2>See AI Barabara in action</h2>
+    <div class="kicker">From photograph to funding decision</div>
+    <h2>One image. Three outputs. Under five seconds.</h2>
     <p class="lead">
-      Upload a road photograph. The ARICS module detects potholes and three crack
-      classes, assigns severity, and produces an engineer-facing report. The
-      Feasibility module then computes repair cost, benefit-cost ratio, and
-      internal rate of return for the section.
+      Upload a road photograph. In one pipeline, AI Barabara detects the defect,
+      produces an engineer-facing report, and runs a full benefit-cost analysis.
+      Scroll each panel to see the full output.
     </p>
 
-    <div style="margin-top: 32px;">
-      <div class="video-wrap">
+    <div class="pipeline">
 
-        <!-- ========================================================= -->
-        <!-- TO ADD YOUR VIDEO:                                        -->
-        <!-- 1. Upload the MP4 to YouTube as Unlisted                  -->
-        <!-- 2. Copy the video ID from the URL                         -->
-        <!--    e.g. https://www.youtube.com/watch?v=ABC123def45       -->
-        <!-- 3. The ID is "ABC123def45"                                -->
-        <!-- 4. Replace YOUR_VIDEO_ID below with that ID               -->
-        <!-- 5. Uncomment the iframe and delete the placeholder div    -->
-        <!-- ========================================================= -->
-
-        <!-- <iframe
-          src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-          title="AI Barabara demo"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen></iframe> -->
-
-        <!-- Placeholder until video is uploaded: -->
-        <div class="video-placeholder">
-          <div class="icon">▶</div>
-          <div>Demo video coming soon</div>
-          <div style="font-size:0.85rem;">A 2–3 minute walkthrough will be embedded here</div>
+      <!-- Step 1: Input photo -->
+      <div class="pipeline-step">
+        <div class="step-bar">
+          <span class="step-badge">STEP 1</span>
+          <span class="step-title">Input</span>
         </div>
+        <div class="img-scroll">
+          <img src="images/input-road.jpg"
+               alt="Input road photograph showing potholes"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'placeholder\'>Input road photograph<br><span style=\'font-size:0.8rem;opacity:0.7\'>Add images/input-road.jpg</span></span>'">
+          <span class="scroll-hint">↕ scroll</span>
+        </div>
+        <div class="caption">
+          <h4>You photograph the road</h4>
+          <p>
+            A smartphone, vehicle-mounted camera, or drone. No specialist
+            equipment, no manual survey. GPS metadata is optional.
+          </p>
+          <div class="arrow">AI Barabara processes the image <span>→</span></div>
+        </div>
+      </div>
 
+      <!-- Step 2: ARICS output -->
+      <div class="pipeline-step">
+        <div class="step-bar">
+          <span class="step-badge">STEP 2</span>
+          <span class="step-title">Detect</span>
+        </div>
+        <div class="img-scroll">
+          <img src="images/arics1.png"
+               alt="ARICS annotated output showing detected potholes"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'placeholder\'>ARICS annotated output<br><span style=\'font-size:0.8rem;opacity:0.7\'>Add images/arics1.png</span></span>'">
+          <span class="scroll-hint">↕ scroll</span>
+        </div>
+        <div class="caption">
+          <h4>ARICS identifies the defect</h4>
+          <p>
+            Pothole or crack class, severity, confidence score, and GIS chainage.
+            Low-confidence detections are flagged for manual verification.
+          </p>
+          <div class="arrow">Feasibility AI runs the economics <span>→</span></div>
+        </div>
       </div>
-      <div class="video-caption">
-        AI Barabara — live road inspection, feasibility analysis, and dashboard walkthrough
+
+      <!-- Step 3: Feasibility output -->
+      <div class="pipeline-step">
+        <div class="step-bar">
+          <span class="step-badge">STEP 3</span>
+          <span class="step-title">Decide</span>
+        </div>
+        <div class="img-scroll">
+          <img src="images/feasibility1.png"
+               alt="Feasibility AI economic evaluation showing NPV, BCR, and IRR"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'placeholder\'>Feasibility AI report<br><span style=\'font-size:0.8rem;opacity:0.7\'>Add images/feasibility1.png</span></span>'">
+          <span class="scroll-hint">↕ scroll</span>
+        </div>
+        <div class="caption">
+          <h4>Feasibility AI returns the numbers</h4>
+          <p>
+            Repair cost, Net Present Value, Benefit-Cost Ratio, and IRR - with a
+            plain-language interpretation a funder can read in 10 seconds.
+          </p>
+          <div class="arrow">An engineer reviews and decides</div>
+        </div>
       </div>
+
     </div>
+
+    <p class="muted" style="margin-top: 24px; font-size: 0.9rem; text-align: center;">
+      Every output is decision-support. A qualified KURA engineer reviews and approves before any work is scheduled.
+    </p>
   </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- KEY METRICS                                                   -->
-<!-- ============================================================ -->
 <section id="evidence" class="tight">
   <div class="wrap">
     <div class="kicker">Evidence of progress</div>
-    <h2>Not a concept — a working prototype</h2>
+    <h2>Not a concept - a working prototype</h2>
     <p class="lead">
-      The ARICS road damage model is trained, validated, and running. The Feasibility
-      AI module produces HDM-4-reduced-form economic outputs. The Dashboard aggregates
-      both into live decision support.
+      Trained, validated, and running today. KURA has already committed
+      KES 14.87M to fund Phase 1.
     </p>
 
     <div class="metrics" style="margin-top: 40px;">
       <div class="metric">
         <div class="label">Model accuracy (mAP50)</div>
         <div class="value">0.49</div>
-        <div class="desc">
-          On a balanced 4,165-image subset of RDD2022. Comparable to published
-          baselines for a nano model trained entirely on CPU.
+        <div class="desc">On a balanced 4,165-image subset of RDD2022.</div>
+        <div class="sowhat">
+          Comparable to published research baselines - achieved with a nano model
+          trained entirely on CPU.
         </div>
       </div>
       <div class="metric">
@@ -359,43 +457,48 @@
           Longitudinal cracks (D00), Transverse cracks (D10),
           Alligator cracking (D20), Potholes (D40).
         </div>
+        <div class="sowhat">
+          Covers the four dominant failure modes on Kenyan paved urban roads.
+        </div>
       </div>
       <div class="metric">
         <div class="label">Phase 1 commitment</div>
         <div class="value">KES 14.87M</div>
         <div class="desc">
-          Signed 24-month methodology between KURA and Origin Labs Africa,
-          covering development, pilot, and knowledge transfer.
+          Signed 24-month methodology between KURA and Origin Labs Africa.
+        </div>
+        <div class="sowhat">
+          Government co-investment already secured - de-risking any follow-on funding.
         </div>
       </div>
       <div class="metric">
         <div class="label">Economic framework</div>
         <div class="value">HDM-4</div>
         <div class="desc">
-          Reduced-form benefit-cost analysis calibrated to published African
-          road unit rates (World Bank ROCKS).
+          Reduced-form benefit-cost analysis calibrated to African road unit rates.
+        </div>
+        <div class="sowhat">
+          The same framework the World Bank uses to appraise road investments.
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- WHAT IT DOES                                                  -->
-<!-- ============================================================ -->
-<section class="tight">
+<section id="modules" class="tight">
   <div class="wrap">
-    <div class="kicker">Four integrated modules</div>
-    <h2>One platform, the full road management cycle</h2>
+    <div class="kicker">Three visible modules</div>
+    <h2>What the platform does</h2>
 
-    <div class="grid" style="margin-top: 40px;">
+    <div class="grid-3">
       <div class="card">
         <div class="num">MODULE 01</div>
-        <h3>ARICS — Road Inspection</h3>
+        <h3>ARICS - Road Inspection</h3>
         <p>
-          Computer-vision inspection of road imagery — vehicle-mounted, drone, or
-          smartphone — detecting four road damage classes with confidence scores
-          and GIS chainage. Replaces slow, subjective manual inspection.
+          Computer-vision inspection of road imagery from smartphone,
+          vehicle-mounted, or drone cameras. Detects four damage classes with
+          confidence scores and GIS chainage. Replaces slow, subjective manual
+          inspection with a repeatable, auditable process.
         </p>
       </div>
       <div class="card">
@@ -403,236 +506,91 @@
         <h3>Feasibility AI</h3>
         <p>
           AI-assisted cost estimation and economic evaluation using an HDM-4
-          reduced-form engine. Produces NPV, Benefit-Cost Ratio, IRR, and scenario
-          comparison over a user-defined analysis period.
+          reduced-form engine. Produces NPV, Benefit-Cost Ratio, IRR, and
+          scenario comparison over a user-defined analysis period - the same
+          outputs a funder expects from a full feasibility study.
         </p>
       </div>
       <div class="card">
         <div class="num">MODULE 03</div>
-        <h3>Existing Software Study</h3>
-        <p>
-          Institutional AI-readiness assessment covering data availability,
-          governance, ICT infrastructure, and capacity — establishing the baseline
-          for integration with KURA's existing systems.
-        </p>
-      </div>
-      <div class="card">
-        <div class="num">MODULE 04</div>
         <h3>Dashboard</h3>
         <p>
-          AI-powered reporting for engineers and management: KPIs, alerts,
-          maintenance priority ranking, and management reports. Decision support,
-          not autonomous decisions.
+          Live KPIs, defect distribution, section condition, alerts, and
+          maintenance priority ranking for engineers and management.
+          Decision-support, not autonomous decisions - every output is
+          reviewable and traceable.
         </p>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- ============================================================ -->
-<!-- SCREENSHOTS — full-width, stacked, readable                   -->
-<!-- ============================================================ -->
-<section id="screenshots">
-  <div class="wrap">
-    <div class="kicker">Product preview</div>
-    <h2>What the platform looks like</h2>
-    <p class="lead">
-      Three screenshots from the live prototype, showing the engineer-facing
-      inspection report, the economic evaluation, and the management dashboard.
-    </p>
-
-    <!-- Screenshot 1 — ARICS -->
-    <div class="screenshot-block">
-      <div class="screenshot-header">
-        <h3>ARICS — Engineer-facing inspection report</h3>
-        <p>Defect class, severity, confidence, chainage, cost band, and recommended action in plain language.</p>
-      </div>
-      <div class="screenshot-frame">
-        <img src="images/arics1.png"
-             alt="ARICS engineer-facing inspection report"
-             loading="lazy">
-      </div>
-    </div>
-
-    <!-- Screenshot 2 — Feasibility -->
-    <div class="screenshot-block">
-      <div class="screenshot-header">
-        <h3>Feasibility AI — Economic evaluation</h3>
-        <p>NPV, BCR, and IRR with plain-language interpretation. Benefit breakdown by VOC, time, and accident savings.</p>
-      </div>
-      <div class="screenshot-frame">
-        <img src="images/feasibility1.png"
-             alt="Feasibility AI economic evaluation"
-             loading="lazy">
-      </div>
-    </div>
-
-    <!-- Screenshot 3 — Dashboard -->
-    <div class="screenshot-block">
-      <div class="screenshot-header">
-        <h3>Dashboard — Management decision support</h3>
-        <p>Live KPIs, defect distribution, section condition breakdown, alerts, and priority ranking.</p>
-      </div>
-      <div class="screenshot-frame">
-        <img src="images/dashboard1.png"
-             alt="Management dashboard"
-             loading="lazy">
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- METHODOLOGY                                                   -->
-<!-- ============================================================ -->
-<section id="methodology" class="tight">
-  <div class="wrap">
-    <div class="kicker">How we build it</div>
-    <h2>A nine-stage, human-in-the-loop methodology</h2>
-    <p class="lead">
-      Every AI output is decision-support. Qualified engineers review and approve
-      before any action. Standards-aligned to Kenya Roads Design Manuals, FIDIC,
-      HDM-4, and the Data Protection Act, 2019.
-    </p>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px;"
-         class="methodology-grid">
-      <div class="timeline">
-        <div class="timeline-item">
-          <h4>1. Inception & Requirements</h4>
-          <p>Project baseline, use cases, requirements specification</p>
-        </div>
-        <div class="timeline-item">
-          <h4>2. Existing Software Study</h4>
-          <p>KURA systems inventory, AI readiness assessment</p>
-        </div>
-        <div class="timeline-item">
-          <h4>3. Data & Knowledge Base</h4>
-          <p>Data architecture, engineering knowledge base, Kenyan imagery</p>
-        </div>
-        <div class="timeline-item">
-          <h4>4a. ARICS AI Module</h4>
-          <p>Computer-vision road inspection with GIS integration</p>
-        </div>
-        <div class="timeline-item">
-          <h4>4b. Feasibility AI Module</h4>
-          <p>AI-assisted cost estimation and economic evaluation</p>
-        </div>
-      </div>
-
-      <div class="timeline">
-        <div class="timeline-item">
-          <h4>5. Integration & Dashboard</h4>
-          <p>System integration and AI-powered reporting</p>
-        </div>
-        <div class="timeline-item">
-          <h4>6. Testing & Validation</h4>
-          <p>Unit, integration, model, and engineering validation</p>
-        </div>
-        <div class="timeline-item">
-          <h4>7. Pilot Implementation</h4>
-          <p>Controlled pilot with KURA case project</p>
-        </div>
-        <div class="timeline-item">
-          <h4>8. Training & Knowledge Transfer</h4>
-          <p>User manuals, technical documentation, train-the-trainer</p>
-        </div>
-        <div class="timeline-item">
-          <h4>9. Monitoring & Refinement</h4>
-          <p>Performance monitoring and continuous improvement</p>
-        </div>
-      </div>
-    </div>
-
-    <p class="muted" style="margin-top: 40px; font-size: 0.92rem;">
-      The full methodology document (v1.0, September 2026) is available on request.
+    <p class="muted" style="margin-top: 32px; font-size: 0.9rem;">
+      Built to a nine-stage, human-in-the-loop methodology aligned with Kenya Roads Design Manuals,
+      FIDIC, HDM-4, and the Data Protection Act, 2019. The full methodology document
+      (v1.0, September 2026) is available on request.
     </p>
   </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- THE ASK                                                       -->
-<!-- ============================================================ -->
 <section id="ask">
   <div class="wrap">
     <div class="kicker">What we are seeking</div>
     <h2>Enabling conditions for scale</h2>
 
     <p class="lead">
-      KURA has committed <strong>KES 14.87 million for Phase 1</strong> — a 24-month
-      development and pilot programme covering staff, workstation procurement,
-      contracted imagery collection, and pilot activities. That commitment funds the
-      <strong>proof of concept</strong>.
-    </p>
-
-    <p class="lead" style="margin-top: 16px;">
-      The transition from a successful pilot to a <strong>national and continental
-      deployment</strong> requires enabling conditions that Phase 1 does not cover.
-      These are the supports we are seeking through the ECA Innovation Café.
+      KURA has committed <strong>KES 14.87 million for Phase 1</strong> - a 24-month
+      programme covering development, pilot, and knowledge transfer. That commitment
+      funds the <strong>proof of concept</strong>. The transition to national and
+      continental deployment requires three enabling conditions we are seeking
+      through the ECA Innovation Café.
     </p>
 
     <div class="ask">
       <h3>What Phase 1 delivers vs. what remains</h3>
 
-      <p style="margin-top: 20px;"><strong>Phase 1 (KURA-funded, KES 14.87M) delivers:</strong></p>
-      <ul>
-        <li>Inception, requirements, and project baseline</li>
-        <li>Existing software study and institutional AI readiness assessment</li>
-        <li>Data architecture and engineering knowledge base</li>
-        <li>100–150 km of Kenyan road imagery collection with GPS metadata</li>
-        <li>Functional prototypes of ARICS, Feasibility AI, and Dashboard</li>
-        <li>Testing, engineering validation, and User Acceptance Testing</li>
-        <li>Three-month pilot with a KURA case project</li>
-        <li>Training, documentation, and knowledge transfer</li>
-      </ul>
-
-      <p style="margin-top: 24px;"><strong>What remains beyond Phase 1 — the ask:</strong></p>
-      <ul>
-        <li>
-          <strong>Compute access.</strong> Sustained GPU resources for retraining on
-          Kenyan imagery with larger model variants. Our current model was trained
-          on CPU because free-tier cloud GPU runs were terminated at epochs 5 and 11.
-        </li>
-        <li>
-          <strong>Nationwide imagery collection.</strong> Beyond the pilot corridor,
-          national deployment requires orders of magnitude more data.
-        </li>
-        <li>
-          <strong>Policy engagement.</strong> Clear guidance on how road agencies can
-          procure, validate, and deploy AI systems — including data-sharing frameworks
-          and reference standards.
-        </li>
-        <li>
-          <strong>Partnership linkages.</strong> Connections to other African road
-          agencies, development finance institutions, and research institutions.
-        </li>
-      </ul>
+      <div class="ask-row">
+        <div>
+          <h4>Phase 1 - KURA-funded (KES 14.87M)</h4>
+          <ul>
+            <li>Functional prototypes of ARICS, Feasibility AI, and Dashboard</li>
+            <li>100–150 km of Kenyan road imagery collected with GPS metadata</li>
+            <li>Institutional AI-readiness assessment</li>
+            <li>Three-month pilot with a KURA case project</li>
+            <li>Testing, validation, training, and knowledge transfer</li>
+          </ul>
+        </div>
+        <div>
+          <h4>What remains - the ask</h4>
+          <ul>
+            <li>
+              <strong>Compute access.</strong> Sustained GPU resources for retraining
+              on Kenyan imagery with larger model variants.
+            </li>
+            <li>
+              <strong>Nationwide imagery collection.</strong> Beyond the pilot corridor,
+              national deployment requires orders of magnitude more data.
+            </li>
+            <li>
+              <strong>Policy engagement and partnerships.</strong> Guidance on how road
+              agencies procure and deploy AI - plus linkages to other African road
+              agencies, development finance institutions, and research institutions.
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- CONTACT                                                       -->
-<!-- ============================================================ -->
 <section id="contact" class="tight">
   <div class="wrap">
     <div class="kicker">Get in touch</div>
     <h2>Contact</h2>
 
-    <div class="contact" style="margin-top: 32px;">
-      <div>
-        <h4>Project lead</h4>
-        <p><strong>Dr. John Wandeto</strong></p>
-        <p>Origin Labs Africa</p>
-        <p><a href="mailto:your.email@example.com">your.email@example.com</a></p>
-      </div>
-      <div>
-        <h4>KURA project contact</h4>
-        <p><strong>Eng. Kurui K Kigen</strong></p>
-        <p>Kenya Urban Roads Authority</p>
-        <p class="muted">Contact via project lead</p>
-      </div>
+    <div class="contact-single">
+      <h4>Project lead</h4>
+      <p class="name">Dr. John Wandeto</p>
+      <p class="org">Origin Labs Africa</p>
+      <a class="email" href="mailto:john.wandeto@dkut.ac.ke">john.wandeto@dkut.ac.ke</a>
     </div>
 
     <p class="muted" style="margin-top: 24px; font-size: 0.9rem;">
@@ -642,26 +600,17 @@
   </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- FOOTER                                                        -->
-<!-- ============================================================ -->
 <footer>
   <div class="wrap">
     <div>© 2026 Origin Labs Africa · Kenya Urban Roads Authority</div>
     <div>
-      <a href="#demo">Demo</a> ·
+      <a href="#how">How it works</a> ·
       <a href="#evidence">Evidence</a> ·
-      <a href="#methodology">Methodology</a> ·
+      <a href="#modules">Modules</a> ·
       <a href="#contact">Contact</a>
     </div>
   </div>
 </footer>
-
-<!-- Smooth mobile menu toggle (optional enhancement) -->
-<script>
-  // Placeholder: replace with mobile menu if needed later
-  // The site works on mobile without JS.
-</script>
 
 </body>
 </html>
