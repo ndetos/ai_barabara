@@ -1,31 +1,668 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>AI Barabara — Demo</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Barabara — AI-Driven Road Project Management for Africa</title>
+<meta name="description" content="AI Barabara is an AI-driven road project management assistant developed in Kenya for KURA. Computer-vision road inspection, HDM-4-reduced-form feasibility analysis, and decision-support dashboarding.">
+
+<!-- Open Graph for social preview -->
+<meta property="og:title" content="AI Barabara — AI-Driven Road Project Management for Africa">
+<meta property="og:description" content="Working prototype developed with the Kenya Urban Roads Authority (KURA). 4-class road damage detection, HDM-4 feasibility analysis, and decision-support dashboard.">
+<meta property="og:type" content="website">
+
 <style>
-body{font-family:system-ui;margin:0;background:#0f172a;color:#e2e8f0}
-.wrap{max-width:1100px;margin:0 auto;padding:32px}
-h1{font-size:2.2rem;margin:0 0 8px}
-.sub{color:#94a3b8;margin-bottom:28px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
-.card h3{margin:0 0 8px;color:#38bdf8}
-.card a{color:#e2e8f0;text-decoration:none}
-.card a:hover{color:#38bdf8}
-.tag{font-size:.75rem;padding:2px 8px;border-radius:999px;background:#334155;color:#94a3b8;margin-left:6px}
-.real{background:#065f46;color:#d1fae5}
-</style></head>
-<body><div class="wrap">
-<h1>AI Barabara</h1>
-<div class="sub">AI-Driven Road Project Management Assistant — Kenya Urban Roads Authority &amp; Origin Labs Africa</div>
-<div class="grid">
-  <div class="card"><h3>1. Inception</h3><a href="/stage/inception">Requirements &amp; vision</a></div>
-  <div class="card"><h3>2. Existing Software</h3><a href="/stage/readiness">Systems &amp; AI readiness</a></div>
-  <div class="card"><h3>3. Data &amp; KB</h3><a href="/stage/data">Data sources &amp; manuals</a></div>
-  <div class="card"><h3>4a. ARICS <span class="tag real">REAL</span></h3><a href="/static/arics.html">Road inspection</a></div>
-  <div class="card"><h3>4b. Feasibility AI <span class="tag real">REAL</span></h3><a href="/static/feasibility.html">Economic evaluation</a></div>
-  <div class="card"><h3>5. Dashboard <span class="tag real">REAL</span></h3><a href="/static/dashboard.html">KPIs &amp; alerts</a></div>
-  <div class="card"><h3>6. Testing</h3><a href="/stage/testing">Model metrics</a></div>
-  <div class="card"><h3>7. Pilot</h3><a href="/stage/pilot">Case project</a></div>
-  <div class="card"><h3>8. Training</h3><a href="/stage/training">Materials</a></div>
-  <div class="card"><h3>9. Monitoring</h3><a href="/stage/monitoring">Metrics</a></div>
-</div>
-</div></body></html>
+  :root {
+    --bg: #0a0f1e;
+    --bg-elev: #111a2e;
+    --card: #1a2438;
+    --border: #2a3852;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-dim: #0ea5e9;
+    --good: #10b981;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+    --max: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    margin: 0; padding: 0; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { max-width: 100%; display: block; }
+
+  /* --- Navigation --- */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 15, 30, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: var(--max); margin: 0 auto; padding: 14px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  nav .brand { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
+  nav .brand span { color: var(--accent); }
+  nav ul { list-style: none; display: flex; gap: 24px; margin: 0; padding: 0; }
+  nav ul a { color: var(--muted); font-size: 0.9rem; }
+  nav ul a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 720px) { nav ul { display: none; } }
+
+  /* --- Layout --- */
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  section { padding: 80px 0; }
+  section.tight { padding: 60px 0; }
+  @media (max-width: 720px) { section { padding: 56px 0; } }
+
+  h1 { font-size: 2.8rem; line-height: 1.15; margin: 0 0 16px;
+       letter-spacing: -0.02em; font-weight: 700; }
+  h2 { font-size: 2rem; margin: 0 0 16px; letter-spacing: -0.015em; font-weight: 700; }
+  h3 { font-size: 1.15rem; margin: 0 0 12px; font-weight: 600; }
+  @media (max-width: 720px) { h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } }
+
+  .kicker {
+    font-size: 0.85rem; color: var(--accent); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;
+  }
+  .lead { font-size: 1.15rem; color: var(--muted); max-width: 780px; }
+  .muted { color: var(--muted); }
+
+  /* --- Hero --- */
+  .hero {
+    padding: 96px 0 64px;
+    background: radial-gradient(ellipse at top, rgba(56,189,248,0.10), transparent 60%);
+  }
+  .hero h1 span { color: var(--accent); }
+  .partners {
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+    margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--border);
+  }
+  .partner {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 0.9rem;
+  }
+  .partner .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  }
+
+  /* --- Buttons --- */
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+  .btn {
+    display: inline-block; padding: 12px 24px; border-radius: 8px;
+    font-weight: 600; font-size: 0.95rem; transition: all 0.15s;
+    border: 1px solid transparent; cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--accent); color: #0a0f1e;
+  }
+  .btn-primary:hover { background: #7dd3fc; text-decoration: none; }
+  .btn-secondary {
+    background: transparent; color: var(--text); border-color: var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+  /* --- Video --- */
+  .video-wrap {
+    position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: #000;
+  }
+  .video-wrap iframe {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%; border: 0;
+  }
+  .video-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: linear-gradient(135deg, #111a2e, #0a0f1e);
+    color: var(--muted); font-size: 1rem; gap: 12px; text-align: center; padding: 24px;
+  }
+  .video-placeholder .icon { font-size: 3rem; color: var(--accent); }
+  .video-caption { color: var(--muted); font-size: 0.9rem; margin-top: 12px; text-align: center; }
+
+  /* --- Metrics --- */
+  .metrics {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .metric {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+  }
+  .metric .label { color: var(--muted); font-size: 0.8rem;
+                   text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .metric .value { font-size: 2.2rem; font-weight: 700; color: var(--accent);
+                   line-height: 1; margin: 12px 0 6px; letter-spacing: -0.02em; }
+  .metric .desc { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+
+  /* --- Feature grid --- */
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px;
+  }
+  .card .num {
+    display: inline-block; font-size: 0.75rem; font-weight: 700;
+    color: var(--accent); letter-spacing: 0.1em; margin-bottom: 12px;
+  }
+  .card p { color: var(--muted); margin: 0; font-size: 0.95rem; line-height: 1.6; }
+
+  /* --- Screenshot gallery --- */
+  .gallery {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .shot {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .shot img {
+    width: 100%; display: block; background: #0a0f1e;
+    aspect-ratio: 16 / 10; object-fit: cover;
+  }
+  .shot .placeholder {
+    aspect-ratio: 16 / 10; display: flex; align-items: center;
+    justify-content: center; color: var(--muted); font-size: 0.9rem;
+    background: #0a0f1e;
+  }
+  .shot .caption {
+    padding: 16px 20px; border-top: 1px solid var(--border);
+  }
+  .shot .caption h4 { margin: 0 0 6px; font-size: 1rem; }
+  .shot .caption p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+
+  /* --- Timeline --- */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .timeline-item { position: relative; padding: 12px 0 24px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -29px; top: 18px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--bg);
+  }
+  .timeline-item h4 { margin: 0 0 4px; font-size: 1rem; }
+  .timeline-item p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  /* --- Ask box --- */
+  .ask {
+    background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(56,189,248,0.02));
+    border: 1px solid rgba(56,189,248,0.3);
+    border-radius: 16px; padding: 40px; margin-top: 24px;
+  }
+  .ask h3 { color: var(--accent); }
+  .ask ul { padding-left: 20px; color: var(--muted); }
+  .ask li { margin: 10px 0; line-height: 1.6; }
+
+  /* --- Contact --- */
+  .contact {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  }
+  @media (max-width: 720px) { .contact { grid-template-columns: 1fr; } }
+  .contact h4 { margin: 0 0 8px; font-size: 1rem; }
+  .contact p { margin: 4px 0; color: var(--muted); font-size: 0.92rem; }
+
+  /* --- Footer --- */
+  footer {
+    border-top: 1px solid var(--border); padding: 40px 0;
+    color: var(--muted); font-size: 0.85rem; text-align: center;
+  }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+
+  /* --- Utility --- */
+  .divider { height: 1px; background: var(--border); margin: 64px 0; }
+  .badge {
+    display: inline-block; padding: 4px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em;
+    background: rgba(16,185,129,0.15); color: var(--good);
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION                                                    -->
+<!-- ============================================================ -->
+<nav>
+  <div class="inner">
+    <div class="brand">AI <span>Barabara</span></div>
+    <ul>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#evidence">Evidence</a></li>
+      <li><a href="#screenshots">Screenshots</a></li>
+      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="#ask">The Ask</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- HERO                                                          -->
+<!-- ============================================================ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Origin Labs Africa · Kenya Urban Roads Authority</div>
+    <h1>AI Barabara — <span>AI-driven road project management</span> for Africa.</h1>
+    <p class="lead">
+      A working prototype that uses computer vision to inspect roads, AI-assisted
+      economic analysis to prioritise maintenance, and a decision-support dashboard
+      for road engineers and management. Developed in Kenya with KURA.
+    </p>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="#demo">Watch the demo</a>
+      <a class="btn btn-secondary" href="#evidence">See the evidence</a>
+      <!-- Update the HF link once your Space is live: -->
+      <a class="btn btn-secondary" href="#ask">Live demo on request</a>
+    </div>
+
+    <div class="partners">
+      <div class="partner"><span class="dot"></span> Kenya Urban Roads Authority (KURA)</div>
+      <div class="partner"><span class="dot"></span> Origin Labs Africa</div>
+      <div class="partner"><span class="badge">Working prototype</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- VIDEO                                                         -->
+<!-- ============================================================ -->
+<section id="demo" class="tight">
+  <div class="wrap">
+    <div class="kicker">Live demo</div>
+    <h2>See AI Barabara in action</h2>
+    <p class="lead">
+      Upload a road photograph. The ARICS module detects potholes and three crack
+      classes, assigns severity, and produces an engineer-facing report. The
+      Feasibility module then computes repair cost, benefit-cost ratio, and
+      internal rate of return for the section.
+    </p>
+
+    <div style="margin-top: 32px;">
+      <div class="video-wrap">
+
+        <!-- ========================================================= -->
+        <!-- TO ADD YOUR VIDEO:                                        -->
+        <!-- 1. Upload the MP4 to YouTube as Unlisted                  -->
+        <!-- 2. Copy the video ID from the URL                         -->
+        <!--    e.g. https://www.youtube.com/watch?v=ABC123def45       -->
+        <!-- 3. The ID is "ABC123def45"                                -->
+        <!-- 4. Replace YOUR_VIDEO_ID below with that ID               -->
+        <!-- 5. Uncomment the iframe and delete the placeholder div    -->
+        <!-- ========================================================= -->
+
+        <!-- <iframe
+          src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+          title="AI Barabara demo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe> -->
+
+        <!-- Placeholder until video is uploaded: -->
+        <div class="video-placeholder">
+          <div class="icon">▶</div>
+          <div>Demo video coming soon</div>
+          <div style="font-size:0.85rem;">A 2–3 minute walkthrough will be embedded here</div>
+        </div>
+
+      </div>
+      <div class="video-caption">
+        AI Barabara — live road inspection, feasibility analysis, and dashboard walkthrough
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- KEY METRICS                                                   -->
+<!-- ============================================================ -->
+<section id="evidence" class="tight">
+  <div class="wrap">
+    <div class="kicker">Evidence of progress</div>
+    <h2>Not a concept — a working prototype</h2>
+    <p class="lead">
+      The ARICS road damage model is trained, validated, and running. The Feasibility
+      AI module produces HDM-4-reduced-form economic outputs. The Dashboard aggregates
+      both into live decision support.
+    </p>
+
+    <div class="metrics" style="margin-top: 40px;">
+      <div class="metric">
+        <div class="label">Model accuracy (mAP50)</div>
+        <div class="value">0.49</div>
+        <div class="desc">
+          On a balanced 4,165-image subset of RDD2022. Comparable to published
+          baselines for a nano model trained entirely on CPU.
+        </div>
+      </div>
+      <div class="metric">
+        <div class="label">Damage classes detected</div>
+        <div class="value">4</div>
+        <div class="desc">
+          Longitudinal cracks (D00), Transverse cracks (D10),
+          Alligator cracking (D20), Potholes (D40).
+        </div>
+      </div>
+      <div class="metric">
+        <div class="label">Phase 1 commitment</div>
+        <div class="value">KES 14.87M</div>
+        <div class="desc">
+          Signed 24-month methodology between KURA and Origin Labs Africa,
+          covering development, pilot, and knowledge transfer.
+        </div>
+      </div>
+      <div class="metric">
+        <div class="label">Economic framework</div>
+        <div class="value">HDM-4</div>
+        <div class="desc">
+          Reduced-form benefit-cost analysis calibrated to published African
+          road unit rates (World Bank ROCKS).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IT DOES                                                  -->
+<!-- ============================================================ -->
+<section class="tight">
+  <div class="wrap">
+    <div class="kicker">Four integrated modules</div>
+    <h2>One platform, the full road management cycle</h2>
+
+    <div class="grid" style="margin-top: 40px;">
+      <div class="card">
+        <div class="num">MODULE 01</div>
+        <h3>ARICS — Road Inspection</h3>
+        <p>
+          Computer-vision inspection of road imagery — vehicle-mounted, drone, or
+          smartphone — detecting four road damage classes with confidence scores
+          and GIS chainage. Replaces slow, subjective manual inspection.
+        </p>
+      </div>
+      <div class="card">
+        <div class="num">MODULE 02</div>
+        <h3>Feasibility AI</h3>
+        <p>
+          AI-assisted cost estimation and economic evaluation using an HDM-4
+          reduced-form engine. Produces NPV, Benefit-Cost Ratio, IRR, and scenario
+          comparison over a user-defined analysis period.
+        </p>
+      </div>
+      <div class="card">
+        <div class="num">MODULE 03</div>
+        <h3>Existing Software Study</h3>
+        <p>
+          Institutional AI-readiness assessment covering data availability,
+          governance, ICT infrastructure, and capacity — establishing the baseline
+          for integration with KURA's existing systems.
+        </p>
+      </div>
+      <div class="card">
+        <div class="num">MODULE 04</div>
+        <h3>Dashboard</h3>
+        <p>
+          AI-powered reporting for engineers and management: KPIs, alerts,
+          maintenance priority ranking, and management reports. Decision support,
+          not autonomous decisions.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCREENSHOTS                                                   -->
+<!-- ============================================================ -->
+<section id="screenshots" class="tight">
+  <div class="wrap">
+    <div class="kicker">Product preview</div>
+    <h2>What the platform looks like</h2>
+
+    <div class="gallery" style="margin-top: 40px;">
+
+      <!-- ========================================================= -->
+      <!-- TO ADD SCREENSHOTS:                                       -->
+      <!-- 1. Save images into /images/ folder                       -->
+      <!-- 2. Replace the placeholder div with an <img> tag          -->
+      <!-- Example:                                                  -->
+      <!--   <img src="images/arics_report.png" alt="ARICS report">  -->
+      <!-- ========================================================= -->
+
+      <div class="shot">
+        <img src="images/arics_report.webm" alt="ARICS engineer-facing inspection report">
+        <div class="caption">
+          <h4>ARICS — Engineer-facing inspection report</h4>
+          <p>
+            Defect class, severity, confidence, chainage, cost band, and recommended
+            action in plain language. Raw JSON available in developer mode.
+          </p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <div class="placeholder">📷 Feasibility AI screenshot</div>
+        <div class="caption">
+          <h4>Feasibility AI — Economic evaluation</h4>
+          <p>
+            NPV, BCR, and IRR with plain-language interpretation. Benefit breakdown
+            by VOC, time, and accident savings. Total capital cost row.
+          </p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <div class="placeholder">📷 Dashboard screenshot</div>
+        <div class="caption">
+          <h4>Dashboard — Management decision support</h4>
+          <p>
+            Live KPIs, defect distribution, section condition breakdown, alerts, and
+            priority ranking across the monitored network.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- METHODOLOGY                                                   -->
+<!-- ============================================================ -->
+<section id="methodology" class="tight">
+  <div class="wrap">
+    <div class="kicker">How we build it</div>
+    <h2>A nine-stage, human-in-the-loop methodology</h2>
+    <p class="lead">
+      Every AI output is decision-support. Qualified engineers review and approve
+      before any action. Standards-aligned to Kenya Roads Design Manuals, FIDIC,
+      HDM-4, and the Data Protection Act, 2019.
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px;"
+         class="methodology-grid">
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>1. Inception & Requirements</h4>
+          <p>Project baseline, use cases, requirements specification</p>
+        </div>
+        <div class="timeline-item">
+          <h4>2. Existing Software Study</h4>
+          <p>KURA systems inventory, AI readiness assessment</p>
+        </div>
+        <div class="timeline-item">
+          <h4>3. Data & Knowledge Base</h4>
+          <p>Data architecture, engineering knowledge base, Kenyan imagery</p>
+        </div>
+        <div class="timeline-item">
+          <h4>4a. ARICS AI Module</h4>
+          <p>Computer-vision road inspection with GIS integration</p>
+        </div>
+        <div class="timeline-item">
+          <h4>4b. Feasibility AI Module</h4>
+          <p>AI-assisted cost estimation and economic evaluation</p>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>5. Integration & Dashboard</h4>
+          <p>System integration and AI-powered reporting</p>
+        </div>
+        <div class="timeline-item">
+          <h4>6. Testing & Validation</h4>
+          <p>Unit, integration, model, and engineering validation</p>
+        </div>
+        <div class="timeline-item">
+          <h4>7. Pilot Implementation</h4>
+          <p>Controlled pilot with KURA case project</p>
+        </div>
+        <div class="timeline-item">
+          <h4>8. Training & Knowledge Transfer</h4>
+          <p>User manuals, technical documentation, train-the-trainer</p>
+        </div>
+        <div class="timeline-item">
+          <h4>9. Monitoring & Refinement</h4>
+          <p>Performance monitoring and continuous improvement</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top: 40px; font-size: 0.92rem;">
+      The full methodology document (v1.0, September 2026) is available on request.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE ASK                                                       -->
+<!-- ============================================================ -->
+<section id="ask">
+  <div class="wrap">
+    <div class="kicker">What we are seeking</div>
+    <h2>Enabling conditions for scale</h2>
+
+    <p class="lead">
+      KURA has committed <strong>KES 14.87 million for Phase 1</strong> — a 24-month
+      development and pilot programme covering staff, workstation procurement,
+      contracted imagery collection, and pilot activities. That commitment funds the
+      <strong>proof of concept</strong>.
+    </p>
+
+    <p class="lead" style="margin-top: 16px;">
+      The transition from a successful pilot to a <strong>national and continental
+      deployment</strong> requires enabling conditions that Phase 1 does not cover.
+      These are the supports we are seeking through the ECA Innovation Café.
+    </p>
+
+    <div class="ask">
+      <h3>What Phase 1 delivers vs. what remains</h3>
+
+      <p style="margin-top: 20px;"><strong>Phase 1 (KURA-funded, KES 14.87M) delivers:</strong></p>
+      <ul>
+        <li>Inception, requirements, and project baseline</li>
+        <li>Existing software study and institutional AI readiness assessment</li>
+        <li>Data architecture and engineering knowledge base</li>
+        <li>100–150 km of Kenyan road imagery collection with GPS metadata</li>
+        <li>Functional prototypes of ARICS, Feasibility AI, and Dashboard</li>
+        <li>Testing, engineering validation, and User Acceptance Testing</li>
+        <li>Three-month pilot with a KURA case project</li>
+        <li>Training, documentation, and knowledge transfer</li>
+      </ul>
+
+      <p style="margin-top: 24px;"><strong>What remains beyond Phase 1 — the ask:</strong></p>
+      <ul>
+        <li>
+          <strong>Compute access.</strong> Sustained GPU resources for retraining on
+          Kenyan imagery with larger model variants. Our current model was trained
+          on CPU because free-tier cloud GPU runs were terminated at epochs 5 and 11.
+        </li>
+        <li>
+          <strong>Nationwide imagery collection.</strong> Beyond the pilot corridor,
+          national deployment requires orders of magnitude more data.
+        </li>
+        <li>
+          <strong>Policy engagement.</strong> Clear guidance on how road agencies can
+          procure, validate, and deploy AI systems — including data-sharing frameworks
+          and reference standards.
+        </li>
+        <li>
+          <strong>Partnership linkages.</strong> Connections to other African road
+          agencies, development finance institutions, and research institutions.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CONTACT                                                       -->
+<!-- ============================================================ -->
+<section id="contact" class="tight">
+  <div class="wrap">
+    <div class="kicker">Get in touch</div>
+    <h2>Contact</h2>
+
+    <div class="contact" style="margin-top: 32px;">
+      <div>
+        <h4>Project lead</h4>
+        <p><strong>Dr. John Wandeto</strong></p>
+        <p>Origin Labs Africa</p>
+        <p><a href="mailto:your.email@example.com">your.email@example.com</a></p>
+      </div>
+      <div>
+        <h4>KURA project contact</h4>
+        <p><strong>Eng. Kurui K Kigen</strong></p>
+        <p>Kenya Urban Roads Authority</p>
+        <p class="muted">Contact via project lead</p>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top: 24px; font-size: 0.9rem;">
+      For ECA Innovation Café correspondence, please contact
+      <a href="mailto:sorene@un.org">sorene@un.org</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                        -->
+<!-- ============================================================ -->
+<footer>
+  <div class="wrap">
+    <div>© 2026 Origin Labs Africa · Kenya Urban Roads Authority</div>
+    <div>
+      <a href="#demo">Demo</a> ·
+      <a href="#evidence">Evidence</a> ·
+      <a href="#methodology">Methodology</a> ·
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Smooth mobile menu toggle (optional enhancement) -->
+<script>
+  // Placeholder: replace with mobile menu if needed later
+  // The site works on mobile without JS.
+</script>
+
+</body>
+</html>
