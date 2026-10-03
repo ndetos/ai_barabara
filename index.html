@@ -430,57 +430,56 @@
 </section>
 
 <!-- ============================================================ -->
-<!-- SCREENSHOTS                                                   -->
+<!-- SCREENSHOTS — full-width, stacked, readable                   -->
 <!-- ============================================================ -->
-<section id="screenshots" class="tight">
+<section id="screenshots">
   <div class="wrap">
     <div class="kicker">Product preview</div>
     <h2>What the platform looks like</h2>
+    <p class="lead">
+      Three screenshots from the live prototype, showing the engineer-facing
+      inspection report, the economic evaluation, and the management dashboard.
+    </p>
 
-    <div class="gallery" style="margin-top: 40px;">
-
-      <!-- ========================================================= -->
-      <!-- TO ADD SCREENSHOTS:                                       -->
-      <!-- 1. Save images into /images/ folder                       -->
-      <!-- 2. Replace the placeholder div with an <img> tag          -->
-      <!-- Example:                                                  -->
-      <!--   <img src="images/arics_report.png" alt="ARICS report">  -->
-      <!-- ========================================================= -->
-
-      <div class="shot">
-        <img src="images/arics_report.webm" alt="ARICS engineer-facing inspection report">
-        <div class="caption">
-          <h4>ARICS — Engineer-facing inspection report</h4>
-          <p>
-            Defect class, severity, confidence, chainage, cost band, and recommended
-            action in plain language. Raw JSON available in developer mode.
-          </p>
-        </div>
+    <!-- Screenshot 1 — ARICS -->
+    <div class="screenshot-block">
+      <div class="screenshot-header">
+        <h3>ARICS — Engineer-facing inspection report</h3>
+        <p>Defect class, severity, confidence, chainage, cost band, and recommended action in plain language.</p>
       </div>
-
-      <div class="shot">
-        <div class="placeholder">📷 Feasibility AI screenshot</div>
-        <div class="caption">
-          <h4>Feasibility AI — Economic evaluation</h4>
-          <p>
-            NPV, BCR, and IRR with plain-language interpretation. Benefit breakdown
-            by VOC, time, and accident savings. Total capital cost row.
-          </p>
-        </div>
+      <div class="screenshot-frame">
+        <img src="images/arics1.png"
+             alt="ARICS engineer-facing inspection report"
+             loading="lazy">
       </div>
-
-      <div class="shot">
-        <div class="placeholder">📷 Dashboard screenshot</div>
-        <div class="caption">
-          <h4>Dashboard — Management decision support</h4>
-          <p>
-            Live KPIs, defect distribution, section condition breakdown, alerts, and
-            priority ranking across the monitored network.
-          </p>
-        </div>
-      </div>
-
     </div>
+
+    <!-- Screenshot 2 — Feasibility -->
+    <div class="screenshot-block">
+      <div class="screenshot-header">
+        <h3>Feasibility AI — Economic evaluation</h3>
+        <p>NPV, BCR, and IRR with plain-language interpretation. Benefit breakdown by VOC, time, and accident savings.</p>
+      </div>
+      <div class="screenshot-frame">
+        <img src="images/feasibility1.png"
+             alt="Feasibility AI economic evaluation"
+             loading="lazy">
+      </div>
+    </div>
+
+    <!-- Screenshot 3 — Dashboard -->
+    <div class="screenshot-block">
+      <div class="screenshot-header">
+        <h3>Dashboard — Management decision support</h3>
+        <p>Live KPIs, defect distribution, section condition breakdown, alerts, and priority ranking.</p>
+      </div>
+      <div class="screenshot-frame">
+        <img src="images/dashboard1.png"
+             alt="Management dashboard"
+             loading="lazy">
+      </div>
+    </div>
+
   </div>
 </section>
 
