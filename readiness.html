@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Readiness Assessment — AI Barabara</title>
+<meta name="description" content="Institutional AI-readiness assessment for road agencies. Covers data availability, governance, ICT infrastructure, and capacity.">
+<link rel="stylesheet" href="assets/style.css">
+
+<style>
+  
+  .intro-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 32px;
+  }
+  .intro-box p { margin: 0 0 12px; color: var(--muted); font-size: 0.95rem; }
+  .intro-box p:last-child { margin-bottom: 0; }
+  .intro-box strong { color: var(--text); }
+
+  /* --- Progress bar --- */
+  .progress-wrap {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(10, 15, 30, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 16px 0; margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-info {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.85rem; color: var(--muted); margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 6px; background: var(--border);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent);
+    width: 0%; transition: width 0.3s ease;
+    border-radius: 999px;
+  }
+
+  /* --- Questions --- */
+  .dimension-header {
+    display: flex; align-items: center; gap: 12px;
+    margin: 32px 0 16px;
+  }
+  .dimension-header .tag {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em; padding: 4px 10px;
+    border-radius: 999px; text-transform: uppercase;
+  }
+  .dimension-header h2 {
+    font-size: 1.4rem; margin: 0; font-weight: 600;
+  }
+  .dimension-header .desc {
+    color: var(--muted); font-size: 0.9rem; margin-top: 4px;
+  }
+
+  .question {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .question-text {
+    font-size: 1rem; font-weight: 500; margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .question-text .num {
+    color: var(--muted); font-size: 0.85rem; font-weight: 600;
+    margin-right: 8px;
+  }
+
+  /* --- Likert options --- */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+    cursor: pointer; font-size: 0.92rem;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+  .option:hover {
+    background: rgba(56, 189, 248, 0.05);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .option input[type="radio"] {
+    accent-color: var(--accent);
+    width: 16px; height: 16px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .option.selected {
+    background: rgba(56, 189, 248, 0.08);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  /* --- Submit button --- */
+  .submit-row {
+    margin-top: 40px; display: flex; gap: 16px; align-items: center;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--accent); color: #0a0f1e; border: 0;
+    padding: 14px 32px; border-radius: 8px; font-weight: 700;
+    cursor: pointer; font-size: 1rem; transition: background 0.15s;
+  }
+  button:hover:not(:disabled) { background: #7dd3fc; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.secondary {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  button.secondary:hover:not(:disabled) {
+    border-color: var(--accent); color: var(--accent);
+    background: transparent;
+  }
+  .status { color: var(--muted); font-size: 0.9rem; }
+
+  /* --- Results section --- */
+  .results {
+    display: none; margin-top: 48px;
+    background: linear-gradient(135deg, #1a2438, #111a2e);
+    border: 1px solid var(--accent);
+    border-radius: 16px; padding: 40px;
+  }
+  .results.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .results-header {
+    text-align: center; margin-bottom: 32px;
+    padding-bottom: 32px; border-bottom: 1px solid var(--border);
+  }
+  .results-header h2 { margin: 0 0 8px; font-size: 1.5rem; }
+  .readiness-level {
+    font-size: 0.85rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+  .big-score {
+    font-size: 4rem; font-weight: 700; line-height: 1;
+    color: var(--accent); margin: 8px 0;
+  }
+  .big-score-label { font-size: 1rem; color: var(--muted); }
+
+  .verdict {
+    display: inline-block; padding: 6px 16px;
+    border-radius: 999px; font-size: 0.85rem;
+    font-weight: 700; margin-top: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  /* --- Radar chart --- */
+  .radar-wrap {
+    display: flex; justify-content: center;
+    margin: 32px 0; position: relative;
+  }
+  .radar-chart {
+    max-width: 360px; width: 100%;
+    height: auto;
+  }
+
+  /* --- Dimension scores --- */
+  .dimension-list {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-top: 24px;
+  }
+  @media (max-width: 720px) {
+    .dimension-list { grid-template-columns: 1fr; }
+  }
+  .dimension-row {
+    background: rgba(10, 15, 30, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px;
+  }
+  .dimension-row .label {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 10px;
+  }
+  .dimension-row .label .name {
+    font-weight: 600; font-size: 0.95rem;
+  }
+  .dimension-row .label .value {
+    font-size: 0.95rem; font-weight: 700;
+  }
+  .dimension-row .bar-bg {
+    height: 8px; background: var(--border);
+    border-radius: 999px; overflow: hidden;
+  }
+  .dimension-row .bar-fill {
+    height: 100%; border-radius: 999px;
+    transition: width 0.6s ease;
+  }
+
+  /* --- Recommendations --- */
+  .recommendations {
+    margin-top: 32px; padding: 24px;
+    background: rgba(56, 189, 248, 0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+  }
+  .recommendations h3 {
+    margin: 0 0 16px; font-size: 1rem;
+    color: var(--accent);
+  }
+  .recommendations ul {
+    margin: 0; padding-left: 20px;
+    color: var(--text); font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .recommendations li { margin-bottom: 10px; }
+  .recommendations li strong { color: var(--accent); }
+  
+</style>
+</head>
+<body class="page-padded">
+
+<div class="wrap">
+  <p><a href="index.html">← Home</a></p>
+  <h1>AI-Readiness Assessment</h1>
+  <p class="subtitle">
+    Existing Software Study · Stage 2 of the AI Barabara methodology
+  </p>
+
+  <div class="intro-box">
+    <p>
+      Before deploying AI into a road agency, you need to know whether the
+      institution is ready to absorb it. This assessment covers the four
+      dimensions that matter most: <strong>data availability</strong>,
+      <strong>governance</strong>, <strong>ICT infrastructure</strong>, and
+      <strong>staff capacity</strong>.
+    </p>
+    <p>
+      Answer the 12 questions below based on the current state of your
+      institution. The assessment takes about 5 minutes. Your answers stay
+      in your browser — nothing is sent to a server.
+    </p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="progress-label">0 of 12 answered</span>
+      <span id="progress-percent">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <form id="assessment-form">
+    <!-- Questions injected by JS -->
+  </form>
+
+  <div class="submit-row">
+    <button type="button" id="submit-btn" disabled>Show my readiness score</button>
+    <button type="button" class="secondary" id="reset-btn" style="display:none">Reset</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <div class="readiness-level">Your institution's AI-Readiness</div>
+      <div class="big-score" id="big-score">0%</div>
+      <div class="big-score-label">overall readiness score</div>
+      <div class="verdict" id="verdict">—</div>
+    </div>
+
+    <div class="radar-wrap">
+      <svg class="radar-chart" id="radar" viewBox="0 0 300 300"></svg>
+    </div>
+
+    <div class="dimension-list" id="dimension-list"></div>
+
+    <div class="recommendations">
+      <h3>Recommended next steps</h3>
+      <ul id="recommendations-list"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Question bank — 12 questions across 4 dimensions
+// Each answer has a numeric value (0–4) used for scoring
+// ---------------------------------------------------------------------------
+const DIMENSIONS = {
+  data: {
+    name: "Data Availability",
+    short: "Data",
+    color: "#38bdf8",
+    desc: "Whether road condition data exists, is digitised, and is spatially referenced."
+  },
+  governance: {
+    name: "Governance",
+    short: "Governance",
+    color: "#10b981",
+    desc: "Whether policies, standards, and accountability structures exist for data and AI."
+  },
+  ict: {
+    name: "ICT Infrastructure",
+    short: "ICT",
+    color: "#f59e0b",
+    desc: "Whether the hardware, connectivity, and software platforms exist to run AI tools."
+  },
+  capacity: {
+    name: "Staff Capacity",
+    short: "Capacity",
+    color: "#a855f7",
+    desc: "Whether staff have the skills to interpret, use, and supervise AI outputs."
+  }
+};
+
+const QUESTIONS = [
+  // --- DATA AVAILABILITY (3 questions) ---
+  {
+    id: "q1", dim: "data",
+    text: "Does your institution maintain a digital inventory of the road network it manages?",
+    answers: [
+      "No — records are paper-based or not maintained",
+      "Partially — some sections are inventoried",
+      "Yes, in spreadsheets or PDF maps",
+      "Yes, in a GIS database",
+      "Yes — fully integrated with a road management system"
+    ]
+  },
+  {
+    id: "q2", dim: "data",
+    text: "Are road condition inspections digitised at the point of collection?",
+    answers: [
+      "No — inspections are entirely manual and paper-based",
+      "Occasionally — some teams use tablets",
+      "Sometimes — mixed paper and digital",
+      "Mostly — digital with manual upload at the office",
+      "Yes — mobile collection with real-time sync"
+    ]
+  },
+  {
+    id: "q3", dim: "data",
+    text: "Is collected road data spatially referenced (with GPS coordinates or chainage)?",
+    answers: [
+      "No — records are text-only",
+      "Rarely — some records have approximate locations",
+      "Sometimes — GPS is recorded but inconsistently",
+      "Mostly — GPS or chainage recorded for most inspections",
+      "Yes — all inspection data is georeferenced and linked to the network"
+    ]
+  },
+
+  // --- GOVERNANCE (3 questions) ---
+  {
+    id: "q4", dim: "governance",
+    text: "Does your institution have a data governance policy covering collection, storage, and sharing?",
+    answers: [
+      "No policy exists",
+      "Informal practice, no documented policy",
+      "Draft policy under development",
+      "Policy exists but is not widely enforced",
+      "Documented and enforced policy with assigned responsibility"
+    ]
+  },
+  {
+    id: "q5", dim: "governance",
+    text: "Is there a defined process for how AI or automated recommendations feed into maintenance decisions?",
+    answers: [
+      "No — AI is not currently used in decisions",
+      "No process — would be handled ad hoc",
+      "Informal — engineers review AI outputs individually",
+      "Defined — written procedure exists for AI-assisted decisions",
+      "Formal — AI recommendations are reviewed and approved by a named officer"
+    ]
+  },
+  {
+    id: "q6", dim: "governance",
+    text: "Does your institution comply with Kenya's Data Protection Act (2019) for imagery and personal data?",
+    answers: [
+      "No — not yet considered",
+      "Aware of the Act but no compliance process",
+      "Partial — some procedures exist",
+      "Mostly compliant — DPIA conducted for major projects",
+      "Fully compliant — DPIA, retention rules, and Data Sharing Agreements in place"
+    ]
+  },
+
+  // --- ICT INFRASTRUCTURE (3 questions) ---
+  {
+    id: "q7", dim: "ict",
+    text: "Do field staff have reliable access to smartphones or tablets for data collection?",
+    answers: [
+      "No — field staff use personal phones or none",
+      "Some staff have devices, shared across teams",
+      "Most staff have devices, but connectivity is a problem",
+      "Most staff have devices with reliable connectivity",
+      "Every field officer has a dedicated device with mobile data"
+    ]
+  },
+  {
+    id: "q8", dim: "ict",
+    text: "Does your institution have the server or cloud capacity to host AI systems?",
+    answers: [
+      "No — no servers and no cloud subscription",
+      "Basic on-premise servers, no cloud access",
+      "On-premise servers with limited cloud capability",
+      "Cloud infrastructure available (e.g., Azure, AWS, or government cloud)",
+      "Full cloud and on-premise capability with dedicated IT support"
+    ]
+  },
+  {
+    id: "q9", dim: "ict",
+    text: "Is your institution's existing software (e.g., road management system) able to integrate with AI tools via API?",
+    answers: [
+      "No — software is closed and cannot integrate",
+      "Unknown — no assessment of integration capability",
+      "Partially — some exports possible, no API",
+      "Mostly — software has documented APIs",
+      "Fully — modern API-based architecture with integration experience"
+    ]
+  },
+
+  // --- STAFF CAPACITY (3 questions) ---
+  {
+    id: "q10", dim: "capacity",
+    text: "Do engineers and inspectors have basic digital literacy (using spreadsheets, GIS, mobile apps)?",
+    answers: [
+      "No — most staff are paper-only",
+      "Limited — some staff comfortable with spreadsheets",
+      "Mixed — digital literacy varies widely across teams",
+      "Good — most staff are comfortable with digital tools",
+      "Excellent — staff are trained on GIS and modern digital workflows"
+    ]
+  },
+  {
+    id: "q11", dim: "capacity",
+    text: "Has your institution provided any training on AI, machine learning, or data analytics in the last two years?",
+    answers: [
+      "No training offered",
+      "Awareness sessions only — no practical training",
+      "Occasional workshops on data analysis",
+      "Regular training on data tools and analytics",
+      "Structured AI/data training programme with certification"
+    ]
+  },
+  {
+    id: "q12", dim: "capacity",
+    text: "Is there at least one person in your institution responsible for data or AI initiatives?",
+    answers: [
+      "No — no one has this responsibility",
+      "Informal — someone handles data as a side task",
+      "Part-time — a staff member has data duties alongside other roles",
+      "Dedicated — a data officer exists",
+      "Team — a data/AI unit exists with multiple staff"
+    ]
+  }
+];
+
+// ---------------------------------------------------------------------------
+// Render questions
+// ---------------------------------------------------------------------------
+const form = document.getElementById("assessment-form");
+
+QUESTIONS.forEach((q, i) => {
+  const block = document.createElement("div");
+  block.className = "question";
+  block.dataset.qid = q.id;
+  block.dataset.dim = q.dim;
+
+  const qText = document.createElement("div");
+  qText.className = "question-text";
+  qText.innerHTML = `<span class="num">Q${i + 1}.</span> ${q.text}`;
+  block.appendChild(qText);
+
+  const opts = document.createElement("div");
+  opts.className = "options";
+
+  q.answers.forEach((ans, j) => {
+    const label = document.createElement("label");
+    label.className = "option";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = q.id;
+    input.value = j;  // 0..4
+    input.addEventListener("change", () => {
+      // Mark selected
+      opts.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+      label.classList.add("selected");
+      updateProgress();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = ans;
+
+    label.appendChild(input);
+    label.appendChild(text);
+    opts.appendChild(label);
+  });
+
+  block.appendChild(opts);
+  form.appendChild(block);
+});
+
+// Add dimension headers before groups
+// (Insert them before the first question of each dimension)
+const questionsInDOM = form.querySelectorAll(".question");
+const insertedHeaders = new Set();
+questionsInDOM.forEach(qEl => {
+  const dim = qEl.dataset.dim;
+  if (insertedHeaders.has(dim)) return;
+  insertedHeaders.add(dim);
+
+  const header = document.createElement("div");
+  header.className = "dimension-header";
+
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.textContent = DIMENSIONS[dim].short;
+
+  const h2 = document.createElement("h2");
+  h2.textContent = DIMENSIONS[dim].name;
+
+  header.appendChild(tag);
+  header.appendChild(h2);
+
+  const desc = document.createElement("div");
+  desc.className = "desc";
+  desc.textContent = DIMENSIONS[dim].desc;
+  desc.style.marginLeft = "auto";
+  desc.style.maxWidth = "50%";
+  desc.style.textAlign = "right";
+
+  // On small screens, don't use margin auto
+  if (window.innerWidth < 720) {
+    desc.style.marginLeft = "0";
+    desc.style.maxWidth = "100%";
+    desc.style.textAlign = "left";
+    desc.style.marginTop = "8px";
+  }
+
+  header.appendChild(desc);
+
+  // Wrap header + first question in a parent so they appear together
+  form.insertBefore(header, qEl);
+});
+
+// ---------------------------------------------------------------------------
+// Progress tracking
+// ---------------------------------------------------------------------------
+const progressLabel = document.getElementById("progress-label");
+const progressPercent = document.getElementById("progress-percent");
+const progressFill = document.getElementById("progress-fill");
+const submitBtn = document.getElementById("submit-btn");
+const resetBtn = document.getElementById("reset-btn");
+const results = document.getElementById("results");
+const status = document.getElementById("status");
+
+function updateProgress() {
+  const answered = new Set();
+  QUESTIONS.forEach(q => {
+    if (form.querySelector(`input[name="${q.id}"]:checked`)) {
+      answered.add(q.id);
+    }
+  });
+  const pct = Math.round((answered.size / QUESTIONS.length) * 100);
+  progressLabel.textContent = `${answered.size} of ${QUESTIONS.length} answered`;
+  progressPercent.textContent = `${pct}%`;
+  progressFill.style.width = `${pct}%`;
+
+  submitBtn.disabled = answered.size < QUESTIONS.length;
+  submitBtn.textContent = answered.size < QUESTIONS.length
+    ? `Answer all questions (${answered.size}/${QUESTIONS.length})`
+    : "Show my readiness score";
+}
+
+// ---------------------------------------------------------------------------
+// Scoring
+// ---------------------------------------------------------------------------
+function getScores() {
+  const scores = { data: [], governance: [], ict: [], capacity: [] };
+  QUESTIONS.forEach(q => {
+    const checked = form.querySelector(`input[name="${q.id}"]:checked`);
+    if (checked) {
+      scores[q.dim].push(Number(checked.value));
+    }
+  });
+  // Convert each dimension's raw values to a percentage (0-4 scale → 0-100%)
+  const result = {};
+  for (const dim of Object.keys(scores)) {
+    const vals = scores[dim];
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;  // 0..4
+    result[dim] = Math.round((avg / 4) * 100);                   // 0..100
+  }
+  return result;
+}
+
+function getReadinessLevel(overall) {
+  if (overall >= 80) return { level: "Advanced",      color: "#10b981", text: "Ready for production AI deployment" };
+  if (overall >= 60) return { level: "Established",   color: "#84cc16", text: "Ready for a controlled pilot" };
+  if (overall >= 40) return { level: "Emerging",      color: "#f59e0b", text: "Ready for proof-of-concept with support" };
+  if (overall >= 20) return { level: "Foundational",  color: "#f97316", text: "Requires capacity-building before pilot" };
+  return                { level: "Early",         color: "#ef4444", text: "Foundational work needed before AI deployment" };
+}
+
+// ---------------------------------------------------------------------------
+// Render results
+// ---------------------------------------------------------------------------
+function showResults() {
+  const scores = getScores();
+  const overall = Math.round(
+    Object.values(scores).reduce((a, b) => a + b, 0) / Object.keys(scores).length
+  );
+  const readiness = getReadinessLevel(overall);
+
+  // Big score
+  document.getElementById("big-score").textContent = `${overall}%`;
+
+  const verdict = document.getElementById("verdict");
+  verdict.textContent = readiness.text;
+  verdict.style.color = readiness.color;
+  verdict.style.background = `${readiness.color}22`;
+  verdict.style.border = `1px solid ${readiness.color}66`;
+
+  // Radar chart
+  drawRadar(scores);
+
+  // Dimension bars
+  const dimList = document.getElementById("dimension-list");
+  dimList.innerHTML = "";
+  const dimOrder = ["data", "governance", "ict", "capacity"];
+  dimOrder.forEach(dim => {
+    const value = scores[dim];
+    const barColor = value >= 70 ? "#10b981" :
+                     value >= 40 ? "#f59e0b" : "#ef4444";
+    const row = document.createElement("div");
+    row.className = "dimension-row";
+    row.innerHTML = `
+      <div class="label">
+        <span class="name">${DIMENSIONS[dim].name}</span>
+        <span class="value" style="color:${barColor}">${value}%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${value}%;background:${barColor}"></div>
+      </div>`;
+    dimList.appendChild(row);
+  });
+
+  // Recommendations
+  const recList = document.getElementById("recommendations-list");
+  recList.innerHTML = "";
+  const recs = generateRecommendations(scores, overall);
+  recs.forEach(r => {
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${r.title}:</strong> ${r.text}`;
+    recList.appendChild(li);
+  });
+
+  // Show results
+  results.classList.add("active");
+  submitBtn.style.display = "none";
+  resetBtn.style.display = "inline-block";
+  status.textContent = "";
+  results.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function generateRecommendations(scores, overall) {
+  const recs = [];
+
+  if (scores.data < 60) {
+    recs.push({
+      title: "Digitise road condition data first",
+      text: "Before deploying AI, establish a baseline digital inventory of the network. Even a spreadsheet-based inventory with GPS coordinates is a valid starting point; the ARICS module can add to it incrementally."
+    });
+  }
+  if (scores.governance < 60) {
+    recs.push({
+      title: "Establish an AI decision procedure",
+      text: "Draft a written procedure for how AI recommendations feed into maintenance decisions — including who reviews, who approves, and how disagreements are recorded. This protects both the institution and its engineers."
+    });
+  }
+  if (scores.ict < 60) {
+    recs.push({
+      title: "Address ICT infrastructure gaps",
+      text: "Prioritise field devices for inspectors and reliable connectivity at key offices. The ARICS module is designed for smartphone capture, so only basic device access is required to start."
+    });
+  }
+  if (scores.capacity < 60) {
+    recs.push({
+      title: "Invest in staff digital skills",
+      text: "Train at least one data officer and five field engineers on basic digital tools (spreadsheets, GPS apps, GIS viewing) before any AI deployment. The AI Barabara training programme is designed for non-specialist staff."
+    });
+  }
+  if (overall >= 60) {
+    recs.push({
+      title: "Ready for a controlled pilot",
+      text: "Your institution has the baseline conditions for a Phase 1 pilot. Focus on a single KURA case project, measure outcomes over 3 months, and use the results to justify broader deployment."
+    });
+  } else if (overall >= 40) {
+    recs.push({
+      title: "Start with a proof-of-concept on one road",
+      text: "A single-section ARICS pilot on one high-priority road can demonstrate value before broader investment. Use the outputs to build the case for capacity-building across the institution."
+    });
+  } else {
+    recs.push({
+      title: "Build foundational capability first",
+      text: "AI deployment requires a baseline of data, governance, and skills. Rather than attempting a pilot immediately, consider a 6-12 month capacity-building programme focused on digitisation and staff training."
+    });
+  }
+  return recs;
+}
+
+// ---------------------------------------------------------------------------
+// Radar chart (pure SVG)
+// ---------------------------------------------------------------------------
+function drawRadar(scores) {
+  const svg = document.getElementById("radar");
+  const cx = 150, cy = 150, maxR = 100;
+  const dims = ["data", "governance", "ict", "capacity"];
+  const n = dims.length;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;  // start at top
+
+  svg.innerHTML = "";
+
+  // Background rings (25%, 50%, 75%, 100%)
+  [0.25, 0.5, 0.75, 1.0].forEach(frac => {
+    const r = maxR * frac;
+    const points = dims.map((_, i) => {
+      const angle = startAngle + i * angleStep;
+      return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+    }).join(" ");
+    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    polygon.setAttribute("points", points);
+    polygon.setAttribute("fill", "none");
+    polygon.setAttribute("stroke", "#2a3852");
+    polygon.setAttribute("stroke-width", "1");
+    svg.appendChild(polygon);
+  });
+
+  // Axes
+  dims.forEach((_, i) => {
+    const angle = startAngle + i * angleStep;
+    const x2 = cx + maxR * Math.cos(angle);
+    const y2 = cy + maxR * Math.sin(angle);
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", cx);
+    line.setAttribute("y1", cy);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    line.setAttribute("stroke", "#2a3852");
+    line.setAttribute("stroke-width", "1");
+    svg.appendChild(line);
+  });
+
+  // Data polygon
+  const dataPoints = dims.map((dim, i) => {
+    const angle = startAngle + i * angleStep;
+    const value = scores[dim] / 100;
+    const r = maxR * value;
+    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+  }).join(" ");
+
+  const dataPolygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  dataPolygon.setAttribute("points", dataPoints);
+  dataPolygon.setAttribute("fill", "#38bdf822");
+  dataPolygon.setAttribute("stroke", "#38bdf8");
+  dataPolygon.setAttribute("stroke-width", "2");
+  svg.appendChild(dataPolygon);
+
+  // Data dots
+  dims.forEach((dim, i) => {
+    const angle = startAngle + i * angleStep;
+    const value = scores[dim] / 100;
+    const r = maxR * value;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x);
+    circle.setAttribute("cy", y);
+    circle.setAttribute("r", "4");
+    circle.setAttribute("fill", "#38bdf8");
+    svg.appendChild(circle);
+  });
+
+  // Labels
+  const labels = { data: "Data", governance: "Governance", ict: "ICT", capacity: "Capacity" };
+  dims.forEach((dim, i) => {
+    const angle = startAngle + i * angleStep;
+    const labelR = maxR + 30;
+    const x = cx + labelR * Math.cos(angle);
+    const y = cy + labelR * Math.sin(angle);
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("fill", "#94a3b8");
+    text.setAttribute("font-size", "12");
+    text.setAttribute("font-weight", "600");
+    text.textContent = labels[dim];
+    svg.appendChild(text);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Reset
+// ---------------------------------------------------------------------------
+function resetAssessment() {
+  form.reset();
+  form.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+  results.classList.remove("active");
+  submitBtn.style.display = "inline-block";
+  resetBtn.style.display = "none";
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ---------------------------------------------------------------------------
+// Event listeners
+// ---------------------------------------------------------------------------
+submitBtn.addEventListener("click", showResults);
+resetBtn.addEventListener("click", resetAssessment);
+
+// Initial progress
+updateProgress();
+</script>
+
+</body>
+</html>

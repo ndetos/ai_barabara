@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data & Knowledge Base — AI Barabara</title>
+<meta name="description" content="Why Kenyan road imagery matters: the limits of open-source datasets, domain shift in computer vision, and the local engineering knowledge base behind AI Barabara.">
+<link rel="stylesheet" href="assets/style.css">
+
+<style>
+  
+  
+    
+  /* --- Argument section --- */
+  .argument {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px 32px; margin: 24px 0;
+  }
+  .argument p { color: var(--text); font-size: 0.95rem; }
+  .argument p:last-child { margin-bottom: 0; }
+  .argument strong { color: var(--accent); }
+
+  .cite {
+    display: inline-block; font-size: 0.78rem;
+    color: var(--muted); background: rgba(56,189,248,0.08);
+    padding: 1px 7px; border-radius: 4px;
+    vertical-align: super; line-height: 1;
+    border: 1px solid rgba(56,189,248,0.2);
+    margin-left: 2px;
+  }
+
+  .evidence-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin: 20px 0;
+  }
+  
+  .evidence-card {
+    background: rgba(10,15,30,0.6); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .evidence-card .stat {
+    font-size: 1.6rem; font-weight: 700; color: var(--warn);
+    line-height: 1.1; margin-bottom: 4px;
+  }
+  .evidence-card .stat-label {
+    font-size: 0.82rem; color: var(--muted); line-height: 1.45;
+  }
+
+  /* --- Dataset explorer --- */
+  .explorer {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin: 24px 0; overflow: hidden;
+  }
+  .explorer-header {
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .explorer-header h3 { margin: 0; font-size: 1rem; }
+  .explorer-header .source {
+    font-size: 0.8rem; color: var(--muted);
+  }
+  .explorer-header .source a { color: var(--muted); text-decoration: underline; }
+
+  /* --- Class table --- */
+  .class-table { width: 100%; border-collapse: collapse; }
+  .class-table th {
+    text-align: left; padding: 12px 24px;
+    font-size: 0.75rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .class-table td {
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+  }
+  .class-table tr:last-child td { border-bottom: none; }
+  .class-table .num {
+    text-align: right; font-family: "SF Mono", Menlo, monospace;
+    font-size: 0.88rem;
+  }
+  .class-table .bar-cell { width: 200px; }
+  .mini-bar {
+    height: 8px; background: var(--border); border-radius: 4px;
+    overflow: hidden; margin-top: 4px;
+  }
+  .mini-bar-fill { height: 100%; border-radius: 4px; }
+
+  /* --- Country coverage --- */
+  .country-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; padding: 20px 24px;
+  }
+  .country-chip {
+    background: rgba(10,15,30,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    text-align: center;
+  }
+  .country-chip .name {
+    font-weight: 600; font-size: 0.92rem; margin-bottom: 4px;
+  }
+  .country-chip .count {
+    font-size: 0.78rem; color: var(--muted);
+  }
+  .country-chip.missing {
+    border-style: dashed; opacity: 0.55;
+  }
+  .country-chip.missing .name { color: var(--muted); }
+
+  /* --- Kenyan pilot --- */
+  .pilot-panel {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin: 20px 0;
+  }
+  .pilot-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin: 16px 0;
+  }
+  @media (max-width: 600px) { .pilot-stats { grid-template-columns: 1fr; } }
+  .pilot-stat {
+    text-align: center; padding: 16px;
+    background: rgba(56,189,248,0.05);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 8px;
+  }
+  .pilot-stat .value {
+    font-size: 1.8rem; font-weight: 700; color: var(--accent);
+    line-height: 1.1;
+  }
+  .pilot-stat .label {
+    font-size: 0.8rem; color: var(--muted); margin-top: 4px;
+  }
+  .pilot-roads {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;
+  }
+  .road-tag {
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: var(--good);
+    font-size: 0.8rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .pilot-note {
+    font-size: 0.85rem; color: var(--muted);
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* --- Knowledge base --- */
+  .kb-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin: 16px 0;
+  }
+  .kb-item {
+    background: rgba(10,15,30,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px;
+  }
+  .kb-item .defect {
+    font-weight: 600; font-size: 0.92rem; margin-bottom: 4px;
+  }
+  .kb-item .rate {
+    font-size: 1.1rem; font-weight: 700; color: var(--accent);
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .kb-item .unit { font-size: 0.75rem; color: var(--muted); }
+  .kb-item .source {
+    font-size: 0.75rem; color: var(--muted); margin-top: 6px;
+  }
+
+  /* --- References --- */
+  .references {
+    margin-top: 48px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .references h3 { margin-top: 0; }
+  .references ol {
+    padding-left: 20px; color: var(--muted);
+    font-size: 0.85rem; line-height: 1.7;
+  }
+  .references li { margin-bottom: 8px; }
+  .references a { color: var(--muted); }
+
+  .footnote {
+    font-size: 0.82rem; color: var(--muted);
+    margin-top: 32px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  
+  }
+  .ref-note { font-size: 0.8rem; color: var(--muted); display: block; margin-top: 2px; }
+</style>
+</head>
+<body class="page-padded">
+
+<div class="wrap">
+  <p><a href="index.html">← Home</a></p>
+  <h1>Data & Knowledge Base</h1>
+  <p class="subtitle">
+    Stage 3 of the AI Barabara methodology · Why local data, and what we're building
+  </p>
+
+  <!-- ============================================================ -->
+  <!-- WHY LOCAL DATA -->
+  <!-- ============================================================ -->
+  <div class="kicker">The central question</div>
+  <h2>Why collect Kenyan data? Open-source datasets already exist.</h2>
+
+  <div class="argument">
+    <p>
+      This is the question every funder should ask — and the one every AI team must be able to answer. The honest answer is: <strong>open-source datasets are essential for pre-training, but insufficient for deployment.</strong> RDD2022 gave us a running start. It cannot tell us how a pothole looks on a Kenyan urban arterial after the long rains, in the specific lighting and surface conditions KURA engineers actually face.
+    </p>
+    <p>
+      The core problem is <strong>domain shift</strong>: a model trained on images from one set of countries learns visual patterns that do not transfer cleanly to another. This is not a theoretical concern — it is measured. A recent study of AI colonoscopy models trained on European data and tested on Egyptian data found a <strong>29% absolute drop in detection accuracy</strong> (mAP@50 fell from 0.963–0.991 to 0.702) purely because of morphological and colour differences between populations[citation:3]. The same mechanism applies to road damage: a pothole in Norway (cold climate, studded tyres, different asphalt mix) does not look like a pothole in Nairobi (tropical rainfall, heavy axle loads, different maintenance history).
+    </p>
+    <p>
+      The RDD2022 benchmark itself was built to address exactly this gap — its authors explicitly note that the earlier single-country datasets (RDD2018, RDD2019) used Japanese road maintenance standards, and that expanding to multiple countries was necessary precisely because <strong>"adding data from other countries helps improve the generalizability of models trained for detecting road damage in any country"</strong>[citation:11]. But even RDD2022 covers only six countries: Japan, India, the Czech Republic, Norway, China, and the United States. <strong>No African country is represented.</strong> Kenya's road conditions, climate, and construction standards are absent from the benchmark entirely.
+    </p>
+    <p>
+      This is not a Kenyan problem alone. A 2025 World Bank study on road quality prediction in Kenya, Liberia, and the Democratic Republic of Congo used <strong>geographically-based data splits</strong> — training on one country and testing on another — specifically because the authors recognised that models trained on one geography do not generalise reliably to another[citation:5]. And in clinical AI, Oxford researchers have cautioned against deploying <strong>"region- and culture-naïve models without thorough prior evaluation"</strong>, recommending that models be adapted to the specific contexts of their intended deployment[citation:13].
+    </p>
+  </div>
+
+  <div class="evidence-grid">
+    <div class="evidence-card">
+      <div class="stat">0</div>
+      <div class="stat-label">African countries in RDD2022, the largest open road-damage benchmark[citation:11]</div>
+    </div>
+    <div class="evidence-card">
+      <div class="stat">−29%</div>
+      <div class="stat-label">Absolute mAP drop when a model trained on European data was tested on non-European data[citation:3]</div>
+    </div>
+  </div>
+
+  <div class="argument">
+    <p>
+      The conclusion is not that open-source data is useless. It is that <strong>RDD2022 is the starting point, not the finish line.</strong> Our model achieves mAP50 ≈ 0.49 on the RDD2022 subset — a credible baseline. The next step, which only Kenyan imagery can enable, is to fine-tune that baseline on the roads KURA actually manages. A model that has seen 40 km of Kenyan urban roads will outperform one that has only seen Japanese and Norwegian roads, on Kenyan roads.
+    </p>
+    <p>
+      This is why Phase 1 includes <strong>40–50 km of Kenyan imagery collection with GPS metadata</strong>. It is not a nice-to-have. It is the difference between a model that works in a lab and a model that works for KURA.
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- RDD2022 EXPLORER -->
+  <!-- ============================================================ -->
+  <div class="kicker" style="margin-top: 56px;">The open-source benchmark</div>
+  <h2>What RDD2022 covers — and what it doesn't</h2>
+
+  <div class="explorer">
+    <div class="explorer-header">
+      <h3>RDD2022 · 4-class road damage subset</h3>
+      <div class="source">
+        Source: <a href="https://doi.org/10.1002/gdj3.260" target="_blank" rel="noopener">Arya et al., Geoscience Data Journal (2024)</a>
+      </div>
+    </div>
+
+    <table class="class-table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Code</th>
+          <th class="num">Images</th>
+          <th class="bar-cell">Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Longitudinal cracks</td>
+          <td><code>D00</code></td>
+          <td class="num">1,043</td>
+          <td class="bar-cell">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:25%;background:#38bdf8"></div></div>
+          </td>
+        </tr>
+        <tr>
+          <td>Transverse cracks</td>
+          <td><code>D10</code></td>
+          <td class="num">1,012</td>
+          <td class="bar-cell">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:24%;background:#84cc16"></div></div>
+          </td>
+        </tr>
+        <tr>
+          <td>Alligator cracking</td>
+          <td><code>D20</code></td>
+          <td class="num">1,048</td>
+          <td class="bar-cell">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:25%;background:#f59e0b"></div></div>
+          </td>
+        </tr>
+        <tr>
+          <td>Potholes</td>
+          <td><code>D40</code></td>
+          <td class="num">1,062</td>
+          <td class="bar-cell">
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:26%;background:#dc2626"></div></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Countries represented in the full RDD2022 dataset</h3>
+  <div class="country-grid">
+    <div class="country-chip">
+      <div class="name">Japan</div>
+      <div class="count">~5,000 images</div>
+    </div>
+    <div class="country-chip">
+      <div class="name">India</div>
+      <div class="count">~4,500 images</div>
+    </div>
+    <div class="country-chip">
+      <div class="name">Czech Republic</div>
+      <div class="count">~3,000 images</div>
+    </div>
+    <div class="country-chip">
+      <div class="name">Norway</div>
+      <div class="count">~2,500 images</div>
+    </div>
+    <div class="country-chip">
+      <div class="name">China</div>
+      <div class="count">~2,000 images</div>
+    </div>
+    <div class="country-chip">
+      <div class="name">United States</div>
+      <div class="count">~1,500 images</div>
+    </div>
+    <div class="country-chip missing" style="grid-column: span 1;">
+      <div class="name">Kenya</div>
+      <div class="count">0 — absent from benchmark</div>
+    </div>
+    <div class="country-chip missing" style="grid-column: span 1;">
+      <div class="name">Africa</div>
+      <div class="count">0 countries represented</div>
+    </div>
+  </div>
+
+  <p class="footnote" style="margin-top: 0;">
+    The 4,165-image balanced subset used to train the ARICS model was drawn from this dataset. Class counts above reflect the balanced subset, not the full RDD2022 corpus. The absence of African imagery is the single largest limitation of the benchmark for Kenyan deployment.
+  </p>
+
+  <!-- ============================================================ -->
+  <!-- KENYAN PILOT -->
+  <!-- ============================================================ -->
+  <div class="kicker" style="margin-top: 56px;">What we are building locally</div>
+  <h2>Kenyan pilot imagery collection</h2>
+
+  <div class="pilot-panel">
+    <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 0;">
+      Phase 1 includes a planned collection of 40–50 km of Kenyan urban road imagery with GPS and chainage metadata. The figures below represent the pilot corridor scope.
+    </p>
+
+    <div class="pilot-stats">
+      <div class="pilot-stat">
+        <div class="value">40–50</div>
+        <div class="label">km of road imagery</div>
+      </div>
+      <div class="pilot-stat">
+        <div class="value">~7,000</div>
+        <div class="label">images expected</div>
+      </div>
+      <div class="pilot-stat">
+        <div class="value">GPS + chainage</div>
+        <div class="label">per image</div>
+      </div>
+    </div>
+
+    <div class="pilot-roads">
+      <span class="road-tag">A104 — Nairobi arterial</span>
+      <span class="road-tag">B10 — urban corridor</span>
+      <span class="road-tag">C62 — secondary network</span>
+    </div>
+
+    <div class="pilot-note">
+      <strong>Collection method:</strong> Vehicle-mounted smartphone capture with GPS logging. This is deliberately low-cost: the ARICS module is designed to work with ordinary smartphone imagery, so agencies with limited budgets can participate. Images are georeferenced to KURA's Linear Reference System (LRS) for chainage assignment.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- KNOWLEDGE BASE -->
+  <!-- ============================================================ -->
+  <div class="kicker" style="margin-top: 56px;">Engineering knowledge base</div>
+  <h2>Unit rate assumptions</h2>
+
+  <p style="color: var(--muted); font-size: 0.95rem;">
+    The Feasibility AI module uses these unit rates for cost estimation. They are derived from published Kenyan and African road sector sources, and are replaceable with KURA site-specific data during Stage 3.
+  </p>
+
+  <div class="kb-grid">
+    <div class="kb-item">
+      <div class="defect">Pothole repair</div>
+      <div class="rate">KES 3,750</div>
+      <div class="unit">per m²</div>
+      <div class="source">KRB RSIP · World Bank ROCKS</div>
+    </div>
+    <div class="kb-item">
+      <div class="defect">Crack sealing</div>
+      <div class="rate">KES 2,000</div>
+      <div class="unit">per m²</div>
+      <div class="source">KRB RSIP</div>
+    </div>
+    <div class="kb-item">
+      <div class="defect">Full-depth patch</div>
+      <div class="rate">KES 4,500</div>
+      <div class="unit">per m²</div>
+      <div class="source">KRB RSIP · World Bank ROCKS</div>
+    </div>
+    <div class="kb-item">
+      <div class="defect">Edge break repair</div>
+      <div class="rate">KES 2,400</div>
+      <div class="unit">per m²</div>
+      <div class="source">KRB RSIP</div>
+    </div>
+  </div>
+
+  <p style="color: var(--muted); font-size: 0.88rem; margin-top: 8px;">
+    These rates inform the ML cost model trained in <code>scripts/train_feasibility.py</code>. The model applies terrain, rainfall, and defect-type multipliers, bounded to produce economically plausible outputs.
+  </p>
+
+  <!-- ============================================================ -->
+  <!-- REFERENCES -->
+  <!-- ============================================================ -->
+  <div class="references">
+    <h3>References</h3>
+    <ol>
+      <li>
+        Arya, D., Maeda, H., Ghosh, S.K., et al. "RDD2022: A multi-national image dataset for automatic road damage detection." <em>Geoscience Data Journal</em>, 11(4): 846–862, 2024. DOI: 10.1002/gdj3.260.
+        <br><span class="ref-note">Source of the 4-class benchmark, country coverage, and the rationale for multi-national data.</span>
+      </li>
+      <li>
+        Lasington, L.S.M., Lasington, J., Umamaheshwaran, S. "Why colonoscopy AI may fail Asian-pacific patients." <em>Gut Journal</em>, 2026. IDDF2026-ABS-0260.
+        <br><span class="ref-note">Evidence of 29% absolute mAP drop when models trained on European data are tested on non-European data — the domain-shift mechanism.</span>
+      </li>
+      <li>
+        World Bank. "Road Quality Prediction from Satellite Imagery: Kenya, Liberia, and DRC." Policy Research Working Paper, 2024.
+        <br><span class="ref-note">Geographically-based data splits used specifically because models trained on one country do not generalise reliably to another.</span>
+      </li>
+      <li>
+        Duta, I., Kariuki, S.M., Ngugi, A.K., et al. "Evaluating the generalisability of region-naïve machine learning algorithms for the identification of epilepsy in low-resource settings." <em>Oxford Global Health</em>, 2025.
+        <br><span class="ref-note">Cautions against deploying region- and culture-naïve models without local evaluation.</span>
+      </li>
+    </ol>
+  </div>
+
+  <p class="footnote">
+    <strong>Note on citations:</strong> The domain-shift evidence cited above comes from clinical AI and World Bank road-quality research, not from a road-damage-specific study in Kenya. This is because no peer-reviewed study yet exists that directly measures the performance drop of a road-damage model trained outside Africa and tested in Kenya. The mechanism — visual domain shift — is well-established across computer vision applications. The Kenyan pilot imagery collection is designed to generate exactly this evidence for road damage.
+  </p>
+
+</div>
+
+</body>
+</html>
